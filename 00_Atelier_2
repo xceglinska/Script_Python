@@ -1,0 +1,42 @@
+import socket
+import os
+
+# Note : AF_UNIX n'est généralement disponible que sur les systèmes Unix/Linux/macOS.
+# Sur Windows, cela pourrait lever une AttributeError selon votre version de Python.
+
+def create_sockets():
+    # 1. Création du socket TCP (IPv4)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s_tcp:
+        
+        # 2. Création du socket UDP (IPv4)
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s_udp:
+            
+            # 3. Création du socket Unix (Local)
+            # On vérifie si AF_UNIX est supporté par le système
+            if hasattr(socket, 'AF_UNIX'):
+                with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s_unix:
+                    
+                    sockets = [
+                        ("TCP (IPv4)", s_tcp),
+                        ("UDP (IPv4)", s_udp),
+                        ("Unix Local", s_unix)
+                    ]
+                    
+                    print(f"{'TYPE':<15} | {'FILENO':<8} | {'FAMILY':<12} | {'TYPE NAME'}")
+                    print("-" * 55)
+                    
+                    for label, s in sockets:
+                        print(f"{label:<15} | {s.fileno():<8} | {s.family.name:<12} | {s.type.name}")
+            else:
+                print("AF_UNIX n'est pas supporté sur ce système.")
+
+if __name__ == "__main__":
+    create_sockets()
+
+
+# Question :
+# Les fileno() doivent-ils être différents ?
+# Oui dans ce cas. Chaque socket crée un descripteur système distinct.
+# Le fileno est un identifiant attribué par le système d’exploitation pour chaque ressource ouverte.
+# Deux sockets créées séparément dans un même processus ne partagent pas le même descripteur.
+# Ils ne peuvent donc pas avoir le même fileno tant qu’ils existent simultanément.

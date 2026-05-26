@@ -1,0 +1,46 @@
+import socket
+import argparse
+import sys
+
+def main():
+    # Configuration d'argparse
+    parser = argparse.ArgumentParser(description="Différence de comportement entre TCP et UDP sur un port fermé.")
+    parser.add_argument(
+        "--protocole", 
+        choices=["tcp", "udp"], 
+        required=True, 
+        help="Choix du protocole à tester (tcp ou udp)"
+    )
+    args = parser.parse_args()
+
+    target = ("127.0.0.1", 1)  # Port 1 : généralement fermé/privilégié
+    timeout = 1.0
+
+    if args.protocole == "tcp":
+        # Tentative de connexion TCP (SOCK_STREAM)
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(timeout)
+            try:
+                s.connect(target)
+                print("TCP → Succès inattendu (port ouvert).")
+            except ConnectionRefusedError:
+                print("TCP → connexion refusée")
+            except socket.timeout:
+                print(f"TCP → timeout ({timeout}s) atteint")
+            except Exception as e:
+                print(f"TCP → Erreur : {e}")
+
+    else: # Mode UDP
+        # Envoi d'un datagramme UDP (SOCK_DGRAM)
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.settimeout(timeout)
+            # En UDP, sendto() n'établit pas de session
+            octets_envoyes = s.sendto(b"Hello", target)
+            
+            if octets_envoyes > 0:
+                print("UDP → datagramme envoyé, aucune confirmation possible")
+            else:
+                print("UDP → échec de l'envoi")
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,47 @@
+import socket
+import os
+
+def explore_socket_pair():
+    # socketpair() crée deux sockets déjà connectés l'un à l'autre.
+    # Par défaut, utilise AF_UNIX sur les systèmes Unix.
+    s1, s2 = socket.socketpair()
+
+    with s1, s2:
+        print(f"{'SOCKET':<10} | {'FILENO':<8} | {'LOCAL (getsockname)':<15} | {'REMOTE (getpeername)':<15}")
+        print("-" * 65)
+        
+        for i, s in enumerate([s1, s2], 1):
+            # On récupère les infos demandées
+            fno = s.fileno()
+            local = s.getsockname()
+            peer = s.getpeername()
+            
+            print(f"Socket {i:<3} | {fno:<8} | {str(local):<15} | {str(peer):<15}")
+
+        """
+        REPONSES AUX QUESTIONS :
+        
+        1. Pourquoi les adresses sont-elles vides ('') ?
+           Dans le cas de AF_UNIX (le défaut de socketpair), l'adresse est normalement 
+           un chemin sur le système de fichiers (ex: /tmp/mysock). Ici, comme les 
+           sockets sont créés simultanément et déjà liés par le noyau, aucun nom 
+           n'a été assigné dans le système de fichiers.
+        
+        2. Que signifie « anonyme » dans ce contexte ?
+           Un socket est "anonyme" lorsqu'il ne possède pas d'adresse liée (bound) 
+           dans l'espace de nommage du système (pas d'IP:Port, pas de chemin de fichier).
+           Il n'existe que sous forme de descripteur de fichier (fileno) hérité par 
+           le processus ou ses enfants. Personne d'autre sur le système ne peut 
+           "appeler" ce socket car il n'a pas de "numéro de téléphone" public.
+        
+        3. En quoi cela diffère-t-il d'un socket TCP/IPv4 classique ?
+           - TCP/IPv4 : Nécessite une adresse (IP) et un port pour que la connexion 
+             puisse être établie de l'extérieur. C'est un adressage global.
+           - socketpair : C'est un canal de communication privé et bidirectionnel 
+             établi immédiatement. C'est très similaire à un "pipe" (tube), mais 
+             en Full-Duplex (on peut lire et écrire des deux côtés). On l'utilise 
+             principalement pour la communication entre un processus parent et son enfant.
+        """
+
+if __name__ == "__main__":
+    explore_socket_pair()

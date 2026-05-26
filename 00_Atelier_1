@@ -1,0 +1,46 @@
+import socket
+import sys
+
+def main():
+    # Vérification de l'argument de ligne de commande
+    if len(sys.argv) < 2:
+        print(f"Usage: python3 {sys.argv[0]} <nom_de_domaine>")
+        sys.exit(1)
+
+    nom_domaine = sys.argv[1]
+    
+    ipv4_list = []
+    ipv6_list = []
+
+    try:
+        # Récupération des informations d'adresse
+        # None pour le port car nous ne cherchons que l'IP
+        infos = socket.getaddrinfo(nom_domaine, None)
+
+        for item in infos:
+            famille = item[0]
+            # L'adresse est le premier élément du tuple (sockaddr) à l'index 4
+            adresse = item[4][0]
+
+            if famille == socket.AF_INET:
+                if adresse not in ipv4_list:
+                    ipv4_list.append(adresse)
+            elif famille == socket.AF_INET6:
+                if adresse not in ipv6_list:
+                    ipv6_list.append(adresse)
+
+        # Affichage des résultats
+        for ip in ipv4_list:
+            print(f"IPv4 : {ip}")
+        
+        for ip in ipv6_list:
+            print(f"IPv6 : {ip}")
+
+        print(f"Total : {len(ipv4_list) + len(ipv6_list)} enregistrement(s)")
+
+    except socket.gaierror:
+        print(f"Erreur : Impossible de résoudre le nom de domaine '{nom_domaine}'")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
