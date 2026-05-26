@@ -1,0 +1,29 @@
+import struct
+
+def etude_boutisme():
+    # Les 4 octets bruts (42 en hexadécimal est 0x2A)
+    donnees = b"\x00\x00\x00\x2A"
+    
+    # 1. Lecture en Big-Endian (Network Byte Order)
+    val_be = struct.unpack("!I", donnees)[0]
+    
+    # 2. Lecture en Little-Endian
+    val_le = struct.unpack("<I", donnees)[0]
+    
+    # 3. Inversion des octets puis lecture en Big-Endian
+    donnees_inversees = donnees[::-1]  # On retourne b"\x2A\x00\x00\x00"
+    val_inv_be = struct.unpack(">I", donnees_inversees)[0]
+    
+    print(f"Octets d'origine          : {donnees.hex(' ')}")
+    print("-" * 45)
+    print(f"1. Big-Endian (standard)  : {val_be}")
+    print(f"2. Little-Endian          : {val_le}")
+    print(f"3. Inversé + Big-Endian   : {val_inv_be}")
+    print("-" * 45)
+    
+    # Vérification
+    if val_le == val_inv_be:
+        print("Vérification : Les valeurs 2 et 3 sont IDENTIQUES.")
+
+if __name__ == "__main__":
+    etude_boutisme()

@@ -1,0 +1,42 @@
+import socket
+
+def recv_ligne(sock):
+    """Lit le socket octet par octet jusqu'à trouver un saut de ligne."""
+    fragments = []
+    
+    while True:
+        # On lit exactement 1 octet
+        octet = sock.recv(1)
+        
+        # Si recv renvoie vide, le socket est fermé
+        if not octet:
+            break
+        
+        # Si on trouve le délimiteur, on arrête la lecture
+        if octet == b"\n":
+            break
+            
+        fragments.append(octet)
+    
+    return b"".join(fragments)
+
+# --- Test avec socketpair ---
+def test_framing():
+    # Création de la paire de sockets
+    emetteur, recepteur = socket.socketpair()
+    
+    with emetteur, recepteur:
+        # Envoi de deux messages séparés par des \n
+        print("Émetteur : envoi de b'bonjour\\nle monde\\n'")
+        emetteur.sendall(b"bonjour\nle monde\n")
+        
+        # Réception du premier message
+        ligne1 = recv_ligne(recepteur)
+        print(f"Réception 1 : {ligne1.decode()}")
+        
+        # Réception du second message
+        ligne2 = recv_ligne(recepteur)
+        print(f"Réception 2 : {ligne2.decode()}")
+
+if __name__ == "__main__":
+    test_framing()

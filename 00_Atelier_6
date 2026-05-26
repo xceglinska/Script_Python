@@ -1,0 +1,54 @@
+import socket
+import struct
+
+def recv_exactement(sock, n):
+    """
+    Helper pour s'assurer de lire exactement n octets.
+    TCP peut renvoyer moins que demandé, il faut donc boucler.
+    """
+    donnees = b""
+    while len(donnees) < n:
+        paquet = sock.recv(n - len(donnees))
+        if not paquet:
+            raise ConnectionError("Le socket a été fermé avant d'avoir reçu toutes les données.")
+        donnees += paquet
+    return donnees
+
+def envoyer_message(sock, message: bytes) -> None:
+    """Envoie un message précédé de sa longueur sur 4 octets (Big-Endian)."""
+    # '!I' signifie : Network Byte Order (Big-Endian) / Unsigned Int (4 octets)
+    prefixe = struct.pack("!I", len(message))
+    sock.sendall(prefixe + message)
+
+def recevoir_message(sock) -> bytes:
+    """Lit le préfixe de 4 octets, puis le message correspondant."""
+    # 1. On récupère la longueur (4 octets)
+    prefixe_bin = recv_exactement(sock, 4)
+    longueur = struct.unpack("!I", prefixe_bin)[0]
+    
+    # 2. On récupère le corps du message grâce à cette longueur
+    return recv_exactement(sock, longueur)
+
+# --- Test avec socketpair ---
+def test_protocole_binaire():
+    s1, s2 = socket.socketpair()
+    
+    messages_a_envoyer = [b"a", b"bb", b"ccc"]
+    
+    with s1, s2:
+        print("--- Phase d'envoi ---")
+        for msg in messages_a_envoyer:
+            print(f"Envoi de : {msg}")
+            envoyer_message(s1, msg)
+        
+        print("\n--- Phase de réception ---")
+        for i in range(len(messages_a_envoyer)):
+            recu = recevoir_message(s2)
+            print(f"Reçu {i+1} : {recu}")
+            
+            # Vérification de l'intégrité
+            assert recu == messages_a_envoyer[i]
+
+if __name__ == "__main__":
+    test_protocole_binaire()
+    print("\nTest réussi : tous les messages ont été correctement reconstruits !")
