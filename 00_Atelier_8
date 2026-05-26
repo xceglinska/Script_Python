@@ -1,0 +1,29 @@
+import socket
+import time
+
+def tester_modes_attente():
+    s1, s2 = socket.socketpair()
+    
+    with s1, s2:
+        # --- TEST 1 : Mode Timeout (0.2s) ---
+        s2.settimeout(0.2)
+        debut = time.perf_counter()
+        try:
+            s2.recv(1024)
+        except socket.timeout:
+            fin = time.perf_counter()
+            duree_timeout = (fin - debut) * 1000
+            print(f"Mode Timeout (0.2s) : {duree_timeout:.2f} ms")
+
+        # --- TEST 2 : Mode Non-Bloquant ---
+        s2.setblocking(False)
+        debut = time.perf_counter()
+        try:
+            s2.recv(1024)
+        except (BlockingIOError, socket.error):
+            fin = time.perf_counter()
+            duree_non_bloquant = (fin - debut) * 1000
+            print(f"Mode Non-Bloquant   : {duree_non_bloquant:.2f} ms")
+
+if __name__ == "__main__":
+    tester_modes_attente()
