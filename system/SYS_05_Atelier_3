@@ -1,0 +1,27 @@
+import sys
+from datetime import datetime
+
+def logger():
+    # 1. Vérification de la présence d'un message
+    if len(sys.argv) < 2:
+        print(f"Usage: python3 {sys.argv[0]} \"votre message\"")
+        sys.exit(1)
+
+    # Récupération du message (on joint les arguments si le message n'est pas entre guillemets)
+    message = " ".join(sys.argv[1:])
+
+    # 2. Préparation de l'horodatage ISO
+    # timespec="seconds" permet d'éviter les microsecondes pour plus de lisibilité
+    now = datetime.now().isoformat(timespec="seconds")
+
+    # 3. Écriture en mode 'a' (Append)
+    # Ce mode crée le fichier s'il n'existe pas et place le curseur à la fin
+    try:
+        with open("app.log", "a", encoding="utf-8") as f:
+            f.write(f"{now} {message}\n")
+    except OSError as e:
+        print(f"Erreur lors de l'écriture du log : {e}", file=sys.stderr)
+        sys.exit(1)
+
+if __name__ == "__main__":
+    logger()
