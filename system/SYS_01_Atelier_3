@@ -1,0 +1,20 @@
+import getpass
+
+def definir_mot_de_passe():
+    while True:
+        # getpass masque la saisie (ne renvoie pas d'astérisques, rien ne s'affiche)
+        mdp1 = getpass.getpass("Nouveau mot de passe : ")
+        mdp2 = getpass.getpass("Confirmation : ")
+
+        if mdp1 == mdp2:
+            # Succès : on sort de la boucle
+            break
+        else:
+            print("Les deux saisies diffèrent, réessaye.\n")
+
+    # Affichage sécurisé des métadonnées uniquement
+    longueur = len(mdp1)
+    print(f"Mot de passe enregistré. ({longueur} caractères)")
+
+if __name__ == "__main__":
+    definir_mot_de_passe()

@@ -1,0 +1,22 @@
+from datetime import date
+
+def calculer_annee_naissance():
+    # 1. Récupération des données (input renvoie toujours du texte)
+    prenom = input("Ton prénom : ")
+    age_str = input("Ton âge : ")
+    
+    # 2. Conversion de l'âge en entier pour pouvoir faire des maths
+    # On pourrait ajouter une gestion d'erreur ici pour les saisies non numériques
+    age = int(age_str)
+    
+    # 3. Récupération de l'année courante via le module datetime
+    annee_actuelle = date.today().year
+    
+    # 4. Calcul de l'année de naissance approximative
+    annee_naissance = annee_actuelle - age
+    
+    # 5. Affichage avec une f-string
+    print(f"Bonjour, {prenom}, tu as {age} ans, donc tu es né(e) vers {annee_naissance}.")
+
+if __name__ == "__main__":
+    calculer_annee_naissance()

@@ -1,0 +1,23 @@
+# Données sources
+PERSONNES = [
+    ("Ada", 36),
+    ("Linus", 54),
+    ("Grace", 85),
+    ("Donald", 87),
+]
+
+def afficher_tableau():
+    # Définition de l'en-tête avec les mêmes contraintes d'alignement
+    # <10 : aligné à gauche sur 10 caractères
+    # >4  : aligné à droite sur 4 caractères
+    print(f"{'Nom':<10} {'Âge':>4}")
+    
+    # Une petite ligne de séparation pour le style (optionnel)
+    # print("-" * 15)
+    
+    for nom, age in PERSONNES:
+        # On applique le formatage à chaque ligne de données
+        print(f"{nom:<10} {age:>4}")
+
+if __name__ == "__main__":
+    afficher_tableau()
