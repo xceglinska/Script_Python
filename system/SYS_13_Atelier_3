@@ -1,0 +1,40 @@
+import secrets
+import tempfile
+import os
+from pathlib import Path
+
+def main():
+    # 1. Génération du token sécurisé (32 octets encodés en base64 URL-safe)
+    token_initial = secrets.token_urlsafe(32)
+
+    # 2. Utilisation d'un dossier temporaire
+    # Le contexte 'with' assure la suppression du dossier à la fin du bloc
+    with tempfile.TemporaryDirectory() as tmpdir:
+        chemin_env = Path(tmpdir) / ".env"
+        
+        # Écriture du fichier .env
+        with open(chemin_env, "w", encoding="utf-8") as f:
+            f.write(f"TOKEN={token_initial}\n")
+        
+        print(f"fichier .env : {chemin_env}")
+        
+        # 3. Lecture et parsing du fichier
+        token_lu = ""
+        with open(chemin_env, "r", encoding="utf-8") as f:
+            contenu = f.read().strip()
+            print(f"contenu     : {contenu}")
+            
+            # Découpage de la ligne TOKEN=valeur
+            cle, separateur, valeur = contenu.partition("=")
+            if cle == "TOKEN":
+                token_lu = valeur
+
+        # 4. Vérification sécurisée
+        # On utilise compare_digest pour éviter les fuites d'informations temporelles
+        est_identique = secrets.compare_digest(token_initial, token_lu)
+        
+        print(f"lu          : {token_lu}")
+        print(f"identique   : {est_identique}")
+
+if __name__ == "__main__":
+    main()
