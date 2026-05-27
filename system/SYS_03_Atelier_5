@@ -1,0 +1,48 @@
+import argparse
+
+def main():
+    parser = argparse.ArgumentParser(description="Convertisseur de températures universel.")
+
+    # Argument positionnel : la valeur
+    parser.add_argument("valeur", type=float, help="La température à convertir")
+
+    # Drapeaux obligatoires avec choices
+    # On utilise dest pour éviter le conflit avec le mot-clé 'from'
+    parser.add_argument("--from", dest="depuis", required=True, 
+                        choices=["celsius", "fahrenheit", "kelvin"],
+                        help="Échelle d'origine")
+    
+    parser.add_argument("--to", dest="vers", required=True, 
+                        choices=["celsius", "fahrenheit", "kelvin"],
+                        help="Échelle de destination")
+
+    # Drapeau optionnel avec valeur par défaut
+    parser.add_argument("--precision", type=int, default=2, 
+                        help="Nombre de décimales (défaut: 2)")
+
+    args = parser.parse_args()
+
+    # --- Étape 1 : Conversion vers le Pivot (Celsius) ---
+    temp_c = 0.0
+    if args.depuis == "celsius":
+        temp_c = args.valeur
+    elif args.depuis == "fahrenheit":
+        temp_c = (args.valeur - 32) * 5/9
+    elif args.depuis == "kelvin":
+        temp_c = args.valeur - 273.15
+
+    # --- Étape 2 : Conversion du Pivot vers la cible ---
+    resultat = 0.0
+    if args.vers == "celsius":
+        resultat = temp_c
+    elif args.vers == "fahrenheit":
+        resultat = temp_c * 9/5 + 32
+    elif args.vers == "kelvin":
+        resultat = temp_c + 273.15
+
+    # --- Étape 3 : Affichage formaté ---
+    # On utilise f-string avec une précision dynamique : .[precision]f
+    print(f"{args.valeur:.{args.precision}f} {args.depuis} = {resultat:.{args.precision}f} {args.vers}")
+
+if __name__ == "__main__":
+    main()
