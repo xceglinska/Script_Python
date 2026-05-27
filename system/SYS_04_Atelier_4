@@ -1,0 +1,37 @@
+from pathlib import Path
+
+def decomposer(chemin_str: str) -> tuple[str, str, str]:
+    """
+    Sépare un chemin en (dossier, nom_sans_extension, extension).
+    """
+    p = Path(chemin_str)
+    
+    # .parent : l'objet chemin du dossier
+    # .stem   : le nom du fichier moins la DERNIÈRE extension
+    # .suffix : la DERNIÈRE extension (ex: .gz pour .tar.gz)
+    
+    dossier = str(p.parent)
+    nom = p.stem
+    extension = p.suffix
+    
+    return (dossier, nom, extension)
+
+def main():
+    # Liste d'exemples "en dur"
+    exemples = [
+        "/tmp/a.txt",
+        "/var/log/archive.tar.gz",
+        "/etc/hosts",
+        "script_local.py"
+    ]
+    
+    print(f"{'Chemin':<25} -> {'(Dossier, Nom, Ext)':<30}")
+    print("-" * 60)
+    
+    for ex in exemples:
+        resultat = decomposer(ex)
+        # Affichage aligné pour la lisibilité
+        print(f"{ex:<25} -> {str(resultat)}")
+
+if __name__ == "__main__":
+    main()
