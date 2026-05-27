@@ -25,4 +25,4 @@ comprends ce que tu fais.
   `atelier_06.py`.
 
 ---
-*Évalué sur le commit `ac6ca5a` (fichier `00_Atelier_6`).*
+*Évalué sur le commit `915e367` (fichier `reseau/00_Atelier_6`).*

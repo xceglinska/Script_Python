@@ -30,4 +30,4 @@ Note technique : `socket.timeout` est un alias historique de
   reconnaissance par les outils Python.
 
 ---
-*Évalué sur le commit `3536527` (fichier `00_Atelier_3`).*
+*Évalué sur le commit `22a3d09` (fichier `reseau/00_Atelier_3`).*

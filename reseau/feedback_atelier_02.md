@@ -32,4 +32,4 @@ observer.
   `if __name__ == "__main__":`.
 
 ---
-*Évalué sur le commit `3536527` (fichier `00_Atelier_2`).*
+*Évalué sur le commit `f9c2cf3` (fichier `reseau/00_Atelier_2`).*

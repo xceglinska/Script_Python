@@ -28,4 +28,4 @@ optionnel mais important pour la suite du cours. À ajouter :
   garde — bonne pratique.
 
 ---
-*Évalué sur le commit `ac6ca5a` (fichier `00_Atelier_5`).*
+*Évalué sur le commit `dcf003d` (fichier `reseau/00_Atelier_5`).*

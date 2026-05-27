@@ -31,4 +31,4 @@ confusion (utilise « nommés » pour être plus précis).
   `atelier_04.py`.
 
 ---
-*Évalué sur le commit `3536527` (fichier `00_Atelier_4`).*
+*Évalué sur le commit `f9d0c9b` (fichier `reseau/00_Atelier_4`).*

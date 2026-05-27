@@ -37,4 +37,4 @@ Bonne copie sur le fond et la forme.
   vu (plutôt qu'un `except Exception` trop large).
 
 ---
-*Évalué sur le commit `3536527` (fichier `00_Atelier_1`).*
+*Évalué sur le commit `ec0cc2e` (fichier `reseau/00_Atelier_1`).*

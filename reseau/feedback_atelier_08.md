@@ -29,4 +29,4 @@ Que faudrait-il pour le faire ? ». À ajouter en commentaire :
 - Code lisible.
 
 ---
-*Évalué sur le commit `ca5e2a1` (fichier `00_Atelier_8`).*
+*Évalué sur le commit `ab86feb` (fichier `reseau/00_Atelier_8`).*
