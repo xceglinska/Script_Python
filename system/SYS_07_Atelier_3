@@ -1,0 +1,44 @@
+import tarfile
+import sys
+from pathlib import Path
+
+def est_sur(base_path: Path, member_path: Path) -> bool:
+    """Vérifie si le chemin extrait reste bien dans le dossier cible."""
+    try:
+        # resolve() élimine les '..' et les liens symboliques
+        # On vérifie si le chemin absolu du fichier commence par celui de la cible
+        cible_absolue = base_path.resolve()
+        fichier_absolu = (base_path / member_path).resolve()
+        return str(fichier_absolu).startswith(str(cible_absolue))
+    except Exception:
+        return False
+
+def extraire_archive(nom_archive: str, dossier_cible: str = "extract"):
+    archive_path = Path(nom_archive)
+    cible_path = Path(dossier_cible)
+    
+    if not archive_path.exists():
+        print(f"Erreur : L'archive '{nom_archive}' est introuvable.")
+        sys.exit(1)
+
+    cible_path.mkdir(exist_ok=True)
+
+    print(f"Extraction de {nom_archive} vers {dossier_cible}/...")
+
+    with tarfile.open(archive_path, "r:gz") as tar:
+        membres_suris = []
+        for membre in tar.getmembers():
+            if est_sur(cible_path, Path(membre.name)):
+                membres_suris.append(membre)
+            else:
+                print(f"⚠️ Tentative d'intrusion bloquée : {membre.name}")
+        
+        # On n'extrait que la liste filtrée
+        tar.extractall(path=cible_path, members=membres_suris)
+        print(f"Succès : {len(membres_suris)} fichiers extraits en toute sécurité.")
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print(f"Usage: python3 {sys.argv[0]} <fichier.tar.gz>")
+    else:
+        extraire_archive(sys.argv[1])

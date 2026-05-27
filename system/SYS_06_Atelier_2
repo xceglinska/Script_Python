@@ -1,0 +1,47 @@
+import sys
+import shutil
+from pathlib import Path
+from datetime import datetime
+
+def backup():
+    # 1. Gestion de l'argument source
+    if len(sys.argv) < 2:
+        print(f"Usage: python3 {sys.argv[0]} <dossier_source>")
+        sys.exit(1)
+
+    source = Path(sys.argv[1])
+
+    # 2. Vérifications de sécurité
+    if not source.exists():
+        print(f"Erreur : La source '{source}' n'existe pas.")
+        sys.exit(1)
+    if not source.is_dir():
+        print(f"Erreur : '{source}' n'est pas un dossier.")
+        sys.exit(1)
+
+    # 3. Génération du nom de destination horodaté
+    # Format : backup_20260527_143012
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    nom_backup = f"backup_{timestamp}"
+    
+    # On place le backup dans le même dossier parent que la source
+    destination = source.parent / nom_backup
+
+    # 4. Copie récursive
+    try:
+        # copytree copie tout le contenu et préserve les métadonnées
+        shutil.copytree(source, destination)
+        
+        # Calcul du nombre de fichiers pour le message final
+        # rglob("*") parcourt tout récursivement
+        nb_fichiers = sum(1 for p in destination.rgob("*") if p.is_file())
+        
+        print(f"Backup créé : {destination}")
+        print(f"Fichiers copiés : {nb_fichiers}")
+
+    except Exception as e:
+        print(f"Erreur lors du backup : {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    backup()
