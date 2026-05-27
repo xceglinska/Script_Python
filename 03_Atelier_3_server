@@ -1,0 +1,27 @@
+import socketserver
+
+class MyTCPHandler(socketserver.StreamRequestHandler):
+    def handle(self):
+        print(f"--- Nouvelle session avec {self.client_address[0]} ---")
+        
+        while True:
+            # On lit une ligne. readline() attend le b'\n'
+            # Si le client ferme la connexion, readline renvoie b'' (EOF)
+            line = self.rfile.readline().strip()
+            
+            if not line:
+                print("Client déconnecté.")
+                break
+            
+            print(f"Message reçu : {line.decode()}")
+            
+            # On répond via wfile (l'écriture est bufferisée)
+            reponse = b"Echo: " + line + b"\n"
+            self.wfile.write(reponse)
+            # Optionnel mais propre : on force l'envoi
+            self.wfile.flush()
+
+if __name__ == "__main__":
+    with socketserver.TCPServer(("localhost", 9999), MyTCPHandler) as server:
+        print("Serveur multi-messages prêt...")
+        server.serve_forever()

@@ -1,0 +1,34 @@
+import socketserver
+import time
+import threading
+
+# 1. On définit la classe de serveur multi-threadé
+# L'ordre est CRUCIAL : le Mixin doit être avant TCPServer pour surcharger 
+# la méthode process_request.
+class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    # Cette classe est vide car le Mixin fait tout le travail de plomberie
+    pass
+
+class MyThreadedHandler(socketserver.BaseRequestHandler):
+    def handle(self):
+        # On récupère le nom du thread actuel pour le log
+        current_thread = threading.current_thread().name
+        print(f"[{current_thread}] Nouveau client : {self.client_address}")
+        
+        # Simulation d'un traitement long (2 secondes)
+        # Sans threading, le serveur serait totalement figé pendant ce temps
+        time.sleep(2)
+        
+        data = self.request.recv(1024)
+        reponse = b"OK - Traite par " + current_thread.encode() + b"\n"
+        self.request.sendall(reponse)
+        
+        print(f"[{current_thread}] Travail termine pour {self.client_address}")
+
+if __name__ == "__main__":
+    HOST, PORT = "localhost", 9999
+    
+    # On utilise notre nouvelle classe de serveur
+    with ThreadedTCPServer((HOST, PORT), MyThreadedHandler) as server:
+        print(f"Serveur MULTI-THREAD actif sur {PORT}...")
+        server.serve_forever()

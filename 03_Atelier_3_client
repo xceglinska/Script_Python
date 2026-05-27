@@ -1,0 +1,22 @@
+import socket
+
+def run_client():
+    HOST, PORT = "localhost", 9999
+    messages = [b"Premier message", b"Deuxieme message", b"Troisieme message"]
+
+    # On ouvre la connexion UNE SEULE FOIS
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.connect((HOST, PORT))
+        print(f"Connecté à {HOST}:{PORT}")
+
+        for msg in messages:
+            print(f"Envoi : {msg.decode()}")
+            # N'oubliez pas le \n pour que le serveur puisse utiliser readline() !
+            sock.sendall(msg + b"\n")
+            
+            # On attend la réponse du serveur pour ce message précis
+            data = sock.recv(1024)
+            print(f"Reçu  : {data.decode().strip()}")
+
+if __name__ == "__main__":
+    run_client()

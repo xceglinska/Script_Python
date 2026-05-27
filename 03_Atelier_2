@@ -1,0 +1,26 @@
+import socketserver
+
+class MyTCPHandler(socketserver.BaseRequestHandler):
+    # Attribut de classe : partagé par toutes les instances de MyTCPHandler
+    compteur = 0
+
+    def handle(self):
+        # 1. On incrémente le compteur de la classe
+        MyTCPHandler.compteur += 1
+        
+        # 2. Réception des données
+        self.data = self.request.recv(1024).strip()
+        
+        # 3. Préparation de la réponse formatée
+        # On utilise une f-string convertie en bytes ou on concatène
+        reponse = f"Bonjour client #{MyTCPHandler.compteur} : {self.data.decode()}.\n"
+        
+        # 4. Envoi au client
+        self.request.sendall(reponse.encode())
+
+if __name__ == "__main__":
+    HOST, PORT = "localhost", 9999
+    
+    with socketserver.TCPServer((HOST, PORT), MyTCPHandler) as server:
+        print(f"Serveur avec compteur actif sur {PORT}...")
+        server.serve_forever()

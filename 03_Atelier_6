@@ -1,0 +1,36 @@
+import socketserver
+from datetime import datetime
+
+class LoggingTCPHandler(socketserver.BaseRequestHandler):
+    """
+    Handler qui enregistre chaque message reçu dans un fichier local.
+    """
+    def handle(self):
+        # 1. Réception de la donnée
+        self.data = self.request.recv(1024).strip()
+        if not self.data:
+            return
+
+        # 2. Préparation des informations de log
+        horodatage = datetime.now().isoformat(sep=" ", timespec="seconds")
+        ip_client = self.client_address[0]
+        message_texte = self.data.decode(errors="replace")
+
+        # Format de la ligne : [DATE] IP : MESSAGE
+        log_line = f"[{horodatage}] {ip_client} : {message_texte}\n"
+
+        # 3. Écriture dans le fichier (mode "a" pour ajouter à la fin)
+        # L'utilisation du 'with' garantit la fermeture du fichier après l'écriture
+        with open("messages.log", "a", encoding="utf-8") as f:
+            f.write(log_line)
+
+        # 4. Réponse symbolique au client
+        self.request.sendall(b"Message enregistre.\n")
+        print(f"Log ajoute pour {ip_client}")
+
+if __name__ == "__main__":
+    HOST, PORT = "localhost", 9999
+    
+    with socketserver.TCPServer((HOST, PORT), LoggingTCPHandler) as server:
+        print(f"Serveur de logging actif sur le port {PORT}...")
+        server.serve_forever()

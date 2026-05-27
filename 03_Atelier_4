@@ -1,0 +1,39 @@
+import socketserver
+
+class MyRawTCPHandler(socketserver.BaseRequestHandler):
+    """
+    Gestionnaire utilisant le socket brut (self.request).
+    Ici, pas de rfile/wfile, on manipule des octets.
+    """
+    def handle(self):
+        print(f"--- Connexion brute établie avec {self.client_address[0]} ---")
+        
+        try:
+            while True:
+                # On reçoit un bloc de données (jusqu'à 1024 octets)
+                # Attention : sans protocole de ligne, recv() renvoie 
+                # ce qui arrive dans le tampon, pas forcément une ligne entière.
+                data = self.request.recv(1024)
+                
+                # Si recv renvoie b'', le client a fermé la connexion
+                if not data:
+                    print("Le client a fermé la connexion.")
+                    break
+                
+                message = data.decode().strip()
+                print(f"Données brutes reçues : {message}")
+                
+                # On renvoie l'écho
+                # On utilise sendall pour garantir que tout le bloc repart
+                reponse = b"Echo brut : " + data
+                self.request.sendall(reponse)
+                
+        except ConnectionResetError:
+            print("Le client a coupé la connexion brusquement.")
+
+if __name__ == "__main__":
+    HOST, PORT = "localhost", 9999
+    # TCPServer fonctionne de la même manière, c'est le Handler qui change
+    with socketserver.TCPServer((HOST, PORT), MyRawTCPHandler) as server:
+        print(f"Serveur BaseRequest actif sur {PORT}...")
+        server.serve_forever()

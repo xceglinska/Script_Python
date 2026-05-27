@@ -1,0 +1,47 @@
+import socketserver
+import struct
+
+def recv_exactement(sock, n):
+    """Garantit la lecture de n octets, même si TCP segmente les données."""
+    donnees = b""
+    while len(donnees) < n:
+        paquet = sock.recv(n - len(donnees))
+        if not paquet:
+            return None # Le client a fermé la connexion
+        donnees += paquet
+    return donnees
+
+class BinaryPrefixHandler(socketserver.BaseRequestHandler):
+    """
+    Handler implémentant un protocole [Longueur (4 octets)][Message (N octets)].
+    """
+    def handle(self):
+        print(f"Connexion binaire de {self.client_address[0]}")
+        
+        while True:
+            # 1. Lecture de la longueur (u32, big-endian)
+            prefixe = recv_exactement(self.request, 4)
+            if not prefixe:
+                break
+            
+            longueur = struct.unpack("!I", prefixe)[0]
+            
+            # 2. Lecture du corps du message
+            payload = recv_exactement(self.request, longueur)
+            if payload is None:
+                break
+            
+            print(f"Message reçu ({longueur} octets) : {payload}")
+
+            # 3. Préparation et envoi de la réponse (Echo préfixé)
+            reponse = b"RECU: " + payload
+            prefixe_reponse = struct.pack("!I", len(reponse))
+            
+            self.request.sendall(prefixe_reponse + reponse)
+
+if __name__ == "__main__":
+    HOST, PORT = "localhost", 9999
+    # On peut même utiliser ThreadingTCPServer ici pour plus de fun !
+    with socketserver.TCPServer((HOST, PORT), BinaryPrefixHandler) as server:
+        print(f"Serveur binaire actif sur {PORT}...")
+        server.serve_forever()
